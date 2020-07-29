@@ -1,0 +1,34 @@
+config:
+  target: 'http://localhost:8000'
+  phases:
+    - duration: 1
+      arrivalRate: 150
+  variables:
+    fibo_exection_number:
+      - 10
+    execution_time_duration:
+      - 1
+    data_slot_size:
+      - 10
+
+  defaults:
+    header:
+      Authorization: "Bearer 'Your-token'"
+scenarios:
+  - flow:
+      - get:
+          url: '/cpu/usage?max_number_fibo={{ fibo_exection_number }}&time_on_execution={{ execution_time_duration }}'
+          capture:
+            json: "$.iteration_number"
+            as: "iteration_number"
+      - get:
+          url: '/memory/array/times/{{ execution_time_duration }}?data_slot={{ data_slot_size }}'
+      - get:
+          url: '/time/long-time/times/{{ execution_time_duration }}'
+          capture:
+            json: "$.iteration_number"
+            as: "iteration_number"
+      - get:
+          url: '/health'
+
+      - log: "Response ->, {{ iteration_number }}"
